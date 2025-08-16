@@ -1,0 +1,50 @@
+{
+  "tasks": {
+    "init-github": {
+      "description": "在 GitHub 上 fork 官方仓库，设置 upstream，并推送到个人仓库",
+      "cwd": "/home/sharelgx/QingdaoOJDeploy",
+      "commands": [
+        "git init",
+        "git remote remove origin || true",
+        "trae github fork QingdaoU/OnlineJudgeDeploy --repo my-qingdaooj",
+        "git remote add origin git@github.com:${GITHUB_USERNAME}/my-qingdaooj.git",
+        "git remote add upstream https://github.com/QingdaoU/OnlineJudgeDeploy.git",
+        "git fetch upstream",
+        "git branch -M main",
+        "git add .",
+        "git commit -m \"初始化 QingdaoOJ 二次开发版本\"",
+        "git push -u origin main"
+      ],
+      "env": {
+        "GITHUB_USERNAME": {
+          "description": "你的GitHub用户名",
+          "required": true
+        }
+      }
+    },
+    "push-code": {
+      "description": "提交本地修改并推送到 GitHub",
+      "cwd": "/home/sharelgx/QingdaoOJDeploy",
+      "commands": [
+        "git add .",
+        "git commit -m \"更新: 二次开发功能\"",
+        "git push origin main"
+      ]
+    },
+    "sync-upstream": {
+      "description": "拉取 QingdaoOJ 官方更新并合并到本地",
+      "cwd": "/home/sharelgx/QingdaoOJDeploy",
+      "commands": [
+        "git fetch upstream",
+        "git merge upstream/main",
+        "git push origin main"
+      ]
+    }
+  },
+  "mcpServers": {
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"]
+    }
+  }
+}

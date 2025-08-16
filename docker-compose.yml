@@ -2,7 +2,7 @@ version: "3"
 services:
 
   oj-redis:
-    image: redis:6.0-alpine
+    image: redis:4.0-alpine
     container_name: oj-redis
     restart: always
     volumes:
@@ -19,22 +19,17 @@ services:
       - POSTGRES_USER=onlinejudge
       - POSTGRES_PASSWORD=onlinejudge
 
-  oj-forum:
-    image: php:7.4-fpm-alpine
-    container_name: oj-forum
-    restart: always
-    volumes:
-      - $PWD/data/forum:/forum
-    environment:
-      # - STATIC_CDN_HOST=http://cdn.oj.com
+#  oj-forum:
+#    image: php:7.4-fpm-alpine
+#    container_name: oj-forum
+#    restart: always
+#    volumes:
+#      - $PWD/data/forum:/forum
+#    environment:
+#      - STATIC_CDN_HOST=
     
   judge-server:
-    # image: registry.cn-hangzhou.aliyuncs.com/onlinejudge/judge_server
-    # 原版镜像
-    # image: registry.cn-hangzhou.aliyuncs.com/wenjian_oj/judgeserver
-    # 开发版镜像
     image: registry.cn-qingdao.aliyuncs.com/wenjian_oj/judge_server
-    # 稳定版镜像
     container_name: judge-server
     restart: always
     read_only: true
@@ -54,25 +49,17 @@ services:
     environment:
       - SERVICE_URL=http://judge-server:8080
       - BACKEND_URL=http://oj-backend:8000/api/judge_server_heartbeat/
-      - TOKEN=CHANGE_THIS
-      # - judger_debug=1
+      - TOKEN=your_secure_token_here
   
   oj-backend:
     image: registry.cn-qingdao.aliyuncs.com/wenjian_oj/backend
-    # 稳定版
-    # image: registry.cn-hangzhou.aliyuncs.com/wenjian_oj/oj-backend
-    # 开发版
-    # image: registry.cn-qingdao.aliyuncs.com/wenjian_oj/vue
-    # 版本备份镜像仓库
-    # image: registry.cn-hangzhou.aliyuncs.com/onlinejudge/oj_backend
-    # 官方版
     container_name: oj-backend
     restart: always
     depends_on:
       - oj-redis
       - oj-postgres
       - judge-server
-      - oj-forum
+#      - oj-forum
     volumes:
       - $PWD/data/backend:/data
       - $PWD/data/forum:/forum
@@ -80,9 +67,7 @@ services:
       - POSTGRES_DB=onlinejudge
       - POSTGRES_USER=onlinejudge
       - POSTGRES_PASSWORD=onlinejudge
-      - JUDGE_SERVER_TOKEN=CHANGE_THIS
-      # - FORCE_HTTPS=1
-      # - STATIC_CDN_HOST=http://cdn.oj.com
+      - JUDGE_SERVER_TOKEN=your_secure_token_here
     ports:
       - "0.0.0.0:80:8000"
       - "0.0.0.0:443:1443"
